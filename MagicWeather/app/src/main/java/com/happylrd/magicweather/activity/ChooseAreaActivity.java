@@ -1,7 +1,10 @@
 package com.happylrd.magicweather.activity;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
@@ -47,6 +50,16 @@ public class ChooseAreaActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        SharedPreferences preferences = PreferenceManager
+                .getDefaultSharedPreferences(this);
+        if (preferences.getBoolean("city_selected", false)) {
+            Intent intent = WeatherActivity.newIntent(this);
+            startActivity(intent);
+            finish();
+            return;
+        }
+
         setContentView(R.layout.choose_area);
 
         mListView = (ListView) findViewById(R.id.list_view);
@@ -67,6 +80,12 @@ public class ChooseAreaActivity extends AppCompatActivity {
                 } else if (mCurrentLevel == LEVEL_CITY) {
                     mSelectedCity = mCityList.get(position);
                     queryCounties();
+                } else if (mCurrentLevel == LEVEL_COUNTY) {
+                    String countyCode = mCountyList.get(position).getCountyCode();
+                    Intent intent = WeatherActivity.newIntent(ChooseAreaActivity.this);
+                    intent.putExtra("county_code", countyCode);
+                    startActivity(intent);
+                    finish();
                 }
             }
         });
