@@ -1,6 +1,7 @@
 package com.happylrd.magicweather.activity;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -27,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ChooseAreaActivity extends AppCompatActivity {
+    public static final String FROM_WEATHER_ACTIVITY = "from_weather_activity";
 
     public static final int LEVEL_PROVINCE = 0;
     public static final int LEVEL_CITY = 1;
@@ -47,13 +49,23 @@ public class ChooseAreaActivity extends AppCompatActivity {
     private City mSelectedCity;
     private int mCurrentLevel;
 
+    private boolean isFromWeatherActivity;
+
+    public static Intent newIntent(Context packageContext) {
+        Intent intent = new Intent(packageContext, ChooseAreaActivity.class);
+        intent.putExtra(FROM_WEATHER_ACTIVITY, true);
+        return intent;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        isFromWeatherActivity = getIntent().getBooleanExtra(FROM_WEATHER_ACTIVITY, false);
 
         SharedPreferences preferences = PreferenceManager
                 .getDefaultSharedPreferences(this);
-        if (preferences.getBoolean("city_selected", false)) {
+        if (preferences.getBoolean("city_selected", false) &&
+                !isFromWeatherActivity) {
             Intent intent = WeatherActivity.newIntent(this);
             startActivity(intent);
             finish();
@@ -214,6 +226,10 @@ public class ChooseAreaActivity extends AppCompatActivity {
         } else if (mCurrentLevel == LEVEL_CITY) {
             queryProvinces();
         } else {
+            if (isFromWeatherActivity) {
+                Intent intent = WeatherActivity.newIntent(this);
+                startActivity(intent);
+            }
             finish();
         }
     }

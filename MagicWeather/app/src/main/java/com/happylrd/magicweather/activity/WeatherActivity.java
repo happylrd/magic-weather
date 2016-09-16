@@ -8,6 +8,7 @@ import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -16,7 +17,7 @@ import com.happylrd.magicweather.util.HttpCallbackListener;
 import com.happylrd.magicweather.util.HttpUtil;
 import com.happylrd.magicweather.util.Utility;
 
-public class WeatherActivity extends AppCompatActivity {
+public class WeatherActivity extends AppCompatActivity implements View.OnClickListener {
 
     private LinearLayout mWeatherInfoLayout;
     private TextView mCityNameText;
@@ -25,9 +26,11 @@ public class WeatherActivity extends AppCompatActivity {
     private TextView mTemp1Text;
     private TextView mTemp2Text;
     private TextView mCurrentDateText;
+    private Button mSwitchCity;
+    private Button mRefreshWeather;
 
-    public static Intent newIntent(Context context) {
-        Intent intent = new Intent(context, WeatherActivity.class);
+    public static Intent newIntent(Context packageContext) {
+        Intent intent = new Intent(packageContext, WeatherActivity.class);
         return intent;
     }
 
@@ -43,6 +46,8 @@ public class WeatherActivity extends AppCompatActivity {
         mTemp1Text = (TextView) findViewById(R.id.temp1);
         mTemp2Text = (TextView) findViewById(R.id.temp2);
         mCurrentDateText = (TextView) findViewById(R.id.current_date);
+        mSwitchCity = (Button) findViewById(R.id.switch_city);
+        mRefreshWeather = (Button) findViewById(R.id.refresh_weather);
 
         String countyCode = getIntent().getStringExtra("county_code");
         if (!TextUtils.isEmpty(countyCode)) {
@@ -52,6 +57,31 @@ public class WeatherActivity extends AppCompatActivity {
             queryWeatherCode(countyCode);
         } else {
             showWeather();
+        }
+
+        mSwitchCity.setOnClickListener(this);
+        mRefreshWeather.setOnClickListener(this);
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.switch_city:
+                Intent intent = ChooseAreaActivity.newIntent(this);
+                startActivity(intent);
+                finish();
+                break;
+            case R.id.refresh_weather:
+                mPublishText.setText("同步中...");
+                SharedPreferences preferences = PreferenceManager
+                        .getDefaultSharedPreferences(this);
+                String weatherCode = preferences.getString("weather_code", "");
+                if (!TextUtils.isEmpty(weatherCode)) {
+                    queryWeatherInfo(weatherCode);
+                }
+                break;
+            default:
+                break;
         }
     }
 
