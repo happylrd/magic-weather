@@ -13,6 +13,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.happylrd.magicweather.R;
+import com.happylrd.magicweather.service.AutoUpdateService;
 import com.happylrd.magicweather.util.HttpCallbackListener;
 import com.happylrd.magicweather.util.HttpUtil;
 import com.happylrd.magicweather.util.Utility;
@@ -141,5 +142,8 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
         mCurrentDateText.setText(preferences.getString("current_date", ""));
         mWeatherInfoLayout.setVisibility(View.VISIBLE);
         mCityNameText.setVisibility(View.VISIBLE);
+
+        Intent intent = new Intent(this, AutoUpdateService.class);
+        startService(intent);
     }
 }
